@@ -53,7 +53,7 @@ module.exports.routes = {
       headers: 'content-type,X-Requested-With'
     }
   },
-    '/stations/class':{
+    '/stations/allClassStations':{
     controller : 'StationsController',
     action : 'getAllClassStations',
     cors: {
@@ -62,7 +62,7 @@ module.exports.routes = {
       headers: 'content-type,X-Requested-With'
     }
   },
-    '/stations/wim':{
+    '/stations/allWIMStations':{
     controller : 'StationsController',
     action : 'getAllWimStations',
     cors: {
@@ -80,7 +80,7 @@ module.exports.routes = {
       headers: 'content-type,X-Requested-With'
     }
   },
-  '/stations/class/:stateFips':{
+  '/state/:statefips/classStations':{
     controller : 'StationsController',
     action : 'getStateClassStations',
     cors: {
@@ -89,16 +89,16 @@ module.exports.routes = {
       headers: 'content-type,X-Requested-With'
     }
   },
-  '/stations/graphwimData/:station_id':{
+  '/station/:id/graphwimData':{
     controller : 'StationsController',
-    action : 'getStationData',
+    action : 'getWimStationData',
     cors: {
       origin: '*',
       methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
       headers: 'content-type,X-Requested-With'
     }
   },
-  '/stations/graphclassData/:station_id':{
+  '/station/:id/graphclassData':{
     controller : 'StationsController',
     action : 'getClassStationData',
     cors: {
@@ -107,7 +107,7 @@ module.exports.routes = {
       headers: 'content-type,X-Requested-With'
     }
   },
-  '/stations/stateGeo/:statefips':{
+  '/state/:statefips/allStationsGeo/':{
     controller : 'StationsController',
     action : 'getStationGeoForState',
     cors: {
@@ -116,18 +116,18 @@ module.exports.routes = {
       headers: 'content-type,X-Requested-With'
     }
   },  
-  '/stations/byStation/:stationId':{
+  '/station/:id/dailyWeights':{
     controller : 'StationsController',
-    action : 'getTrucks',
+    action : 'getDailyWeights',
     cors: {
       origin: '*',
       methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
       headers: 'content-type,X-Requested-With'
     }
   },
-  '/stations/byStation':{
+  '/station/:id/yearsActive':{
     controller : 'StationsController',
-    action : 'getYears',
+    action : 'getYearsActive',
     cors: {
       origin: '*',
       methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
@@ -135,16 +135,16 @@ module.exports.routes = {
     }
 
   },
-  '/stations/byStation/class/:stationId':{
+  '/station/:id/classAmounts':{
     controller : 'StationsController',
-    action : 'getClass',
+    action : 'getClassAmounts',
     cors: {
       origin: '*',
       methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
       headers: 'content-type,X-Requested-With'
     }
   },
-  '/stations/byStation/state/info/:stationId':{
+  '/station/:id/stationInfo':{
     controller : 'StationsController',
     action : 'getStationInfo',
     cors: {

@@ -193,12 +193,12 @@ module.exports = {
 		});
  	},
  	getStateClassStations: function(req,res) {
- 		if(typeof req.param('stateFips') == 'undefined'){
+ 		if(typeof req.param('statefips') == 'undefined'){
  			res.send('{status:"error",message:"state FIPS required"}',500);
  			return;
  		}
  		console.time('total-classState');
- 		var state_fips = req.param('stateFips'),
+ 		var state_fips = req.param('statefips'),
  			database = req.param('database')+'Class';
 
  		//console.time('auth-classState');
@@ -317,11 +317,11 @@ module.exports = {
 		});
  	},
  	getClassStationData: function(req, res) {
- 		if(typeof req.param('station_id') == 'undefined'){
+ 		if(typeof req.param('id') == 'undefined'){
  			res.send('{status:"error",message:"station_id required"}',500);
  			return;
  		}
- 		var station_id = req.param('station_id'),
+ 		var station_id = req.param('id'),
  			depth = req.param('depth'),
  			database = req.param('database')+'Class';
 
@@ -378,12 +378,12 @@ module.exports = {
  			return preds;
  		}
  	},
- 	getStationData:function(req,res){
- 		if(typeof req.param('station_id') == 'undefined'){
+ 	getWimStationData:function(req,res){
+ 		if(typeof req.param('id') == 'undefined'){
  			res.send('{status:"error",message:"station_id required"}',500);
  			return;
  		}
- 		var station_id = req.param('station_id'),
+ 		var station_id = req.param('id'),
  			depth = req.param('depth'),
  			database = req.param('database');
 
@@ -437,14 +437,26 @@ module.exports = {
  			return preds;
  		}
 	},
- 	getTrucks:function(req,res){
- 		console.log('cal get trucks', req.param('database'));
- 		var station_id = req.param('stationId'),
+ 	getDailyWeights:function(req,res){
+ 		//console.log('cal get trucks', req.param('database'));
+ 		var station_id = req.param('id'),
  			database = req.param('database');
  		//console.time('auth');
  		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
 		    //jwt.authorize(function(err, result) {
 		    	if (err) console.log(err);
+
+		    	var sql = 'SELECT num_days, count(num_days) AS numDay, '+
+		    			   'month, day, class, year, '+
+		    			   'sum(total_weight) '+
+		    			   'FROM (SELECT station_id, class, '+
+		    			   		 'concat(string(year), string(month), string(day)) AS num_days, '+
+		    			   		 'month, day, year, total_weight '+
+		    			   		 'FROM [tmasWIM12.'+database+'] '+
+		    			   		 'WHERE station_id="'+station_id+'" '+
+		    			   		 'AND station_id IS NOT null) '+
+ 						   'GROUP BY num_days, month, day, class, year';
+
 			    var request = client.bigquery.jobs.query({
 			    	kind: "bigquery#queryRequest",
 			    	projectId: 'avail-wim',
@@ -452,10 +464,10 @@ module.exports = {
 			    });
 			    //console.timeEnd('auth');
 			    request.body = {};
-			    request.body.query = 'select num_days,count(num_days) as numDay,month,day,class,year,sum(total_weight) from(select station_id,class,concat(string(year),string(month),string(day)) as num_days, month,day,year,total_weight FROM [tmasWIM12.'+database+'] where station_id="'+station_id+'" and station_id is not null) group by num_days,month,day,class,year';
+			    request.body.query = sql;
 			    request.body.projectId = 'avail-wim';
 			    //console.log(request.body.query);
-			    console.time('query');
+			    //console.time('query');
 		      	request.withAuthClient(jwt)
 	        	.execute(function(err, response) {
 	          		if (err) console.log(err);
@@ -468,10 +480,17 @@ module.exports = {
 		    //});
 		});
  	},
- 	getYears:function(req,res){
- 		var database = req.param('database');
+ 	getYearsActive:function(req,res){
+ 		var station_id = req.param('id'),
+ 			database = req.param('database');
+
+ 		if (!station_id || !database) {
+ 			res.send('Error, must specify database and station name', 500);
+ 			return;
+ 		}
+
  		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-		    jwt.authorize(function(err, result) {
+		    //jwt.authorize(function(err, result) {
 		    	if (err) console.log(err);
 		    	//console.log()
 			    var request = client.bigquery.jobs.query({
@@ -480,7 +499,7 @@ module.exports = {
 			    	timeoutMs: '30000'
 			    });
 			    request.body = {};
-			    request.body.query = 'Select min(year),max(year) from [tmasWIM12.'+database+']';
+			    request.body.query = 'SELECT min(year),max(year) FROM [tmasWIM12.'+database+'] WHERE station_id = "'+ station_id + '";';
 			    request.body.projectId = 'avail-wim';
 			    //console.log(request);
 		      	request.withAuthClient(jwt)
@@ -489,15 +508,27 @@ module.exports = {
 	          		//console.log(response);
 	          		res.json(response);
 	        	});
-		    });
+		    //});
 		});
  	},
- 	getClass:function(req,res){
+ 	getClassAmounts:function(req,res){
  		var database = req.param('database'),
  		station_id = req.param('stationId');
  		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-		    jwt.authorize(function(err, result) {
+		    //jwt.authorize(function(err, result) {
 		    	if (err) console.log(err);
+
+		    	var sql = 'SELECT year, month, day, '+
+		    			   'sum(class1), sum(class2), sum(class3), '+
+		    			   'sum(class4), sum(class5), sum(class6), '+
+		    			   'sum(class7), sum(class8), sum(class9), '+
+		    			   'sum(class10), sum(class11), '+
+		    			   'sum(class12), sum(class13), '+
+
+		    			   'FROM [tmasWIM12.'+database+'Class] '+
+		    			   'WHERE station_id="'+station_id+'" '+
+		    			   'GROUP BY year, month, day';
+
 		    	//console.log()
 			    var request = client.bigquery.jobs.query({
 			    	kind: "bigquery#queryRequest",
@@ -505,7 +536,7 @@ module.exports = {
 			    	timeoutMs: '30000'
 			    });
 			    request.body = {};
-			    request.body.query = 'SELECT year, month, day, sum(class1), sum(class2), sum(class3), sum(class4), sum(class5), sum(class6), sum(class7), sum(class8), sum(class9), sum(class10), sum(class11), sum(class12), sum(class13),FROM [tmasWIM12.'+database+'Class] where station_id="'+station_id+'" group by year, month, day';
+			    request.body.query = sql;
 			    request.body.projectId = 'avail-wim';
 			    //console.log(request);
 		      	request.withAuthClient(jwt)
@@ -514,15 +545,30 @@ module.exports = {
 	          		//console.log(response);
 	          		res.json(response);
 	        	});
-		    });
+		    //});
 		});
  	},
 	getStationInfo:function(req,res){
  		var database = req.param('database'),
- 		station_id = req.param('stationId');
+ 			station_id = req.param('id');
+
  		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-		    jwt.authorize(function(err, result) {
+		    //jwt.authorize(function(err, result) {
 		    	if (err) console.log(err);
+
+		    	var sql = 'SELECT func_class_code, num_lanes_direc_indicated, '+
+			    			   'sample_type_for_traffic_vol, method_of_traffic_vol_counting, '+
+			    			   'alg_for_vehicle_class, class_sys_for_vehicle_class, '+
+			    			   'method_of_truck_weighing, calibration_of_weighing_sys, '+
+			    			   'type_of_sensor, second_type_of_sensor, primary_purpose, '+
+			    			   'year_station_established, fips_county_code, '+
+			    			   'concurrent_route_signing, concurrent_signed_route_num, '+
+			    			   'national_highway_sys, posted_sign_route_num, station_location, '+
+			    			   'latitude, longitude,  '+
+		    			   'FROM [tmasWIM12.allStations] '+
+		    			   'WHERE station_id="'+station_id+'" '+
+		    			   'LIMIT 1';
+
 		    	//console.log()
 			    var request = client.bigquery.jobs.query({
 			    	kind: "bigquery#queryRequest",
@@ -530,7 +576,7 @@ module.exports = {
 			    	timeoutMs: '30000'
 			    });
 			    request.body = {};
-			    request.body.query = 'select func_class_code, num_lanes_direc_indicated, sample_type_for_traffic_vol, method_of_traffic_vol_counting, alg_for_vehicle_class, class_sys_for_vehicle_class, method_of_truck_weighing, calibration_of_weighing_sys, type_of_sensor, second_type_of_sensor, primary_purpose, year_station_established, fips_county_code, concurrent_route_signing, concurrent_signed_route_num, national_highway_sys, posted_sign_route_num, station_location,latitude, longitude,  from [tmasWIM12.allStations] where station_id="'+station_id+'" limit 1';
+			    request.body.query = sql;
 			    request.body.projectId = 'avail-wim';
 			    //console.log(request);
 		      	request.withAuthClient(jwt)
@@ -539,7 +585,7 @@ module.exports = {
 	          		//console.log(response);
 	          		res.json(response);
 	        	});
-		    });
+		    //});
 		});
  	}, 	
 
