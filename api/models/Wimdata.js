@@ -8,7 +8,7 @@
 
 module.exports = {
 
-  adapter:'lor_mysql',
+  //adapter:'lor_mysql',
   attributes: {
   	
   	/* e.g.
