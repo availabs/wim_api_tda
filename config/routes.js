@@ -171,6 +171,15 @@ module.exports.routes = {
       headers: 'content-type,X-Requested-With'
     }
   },
+  '/stations/:stateFips/overweight/':{
+    controller : 'StationsController',
+    action : 'getStateOverweightStations',
+    cors: {
+      origin: '*',
+      methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+      headers: 'content-type,X-Requested-With'
+    }
+  },
 
 
 
