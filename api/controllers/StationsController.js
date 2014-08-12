@@ -22,6 +22,7 @@ var jwt = new googleapis.auth.JWT(
 		['https://www.googleapis.com/auth/bigquery']
 	);
 jwt.authorize();	
+var bigQuery = googleapis.bigquery('v2');
 
 module.exports = {    
   	
@@ -75,36 +76,24 @@ module.exports = {
  		var database = req.param('database');
  		console.time('total-AllWim');
 
- 		//console.time('auth-AllWim');
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-	    	if (err) console.log(err);
-		    //console.timeEnd('auth-AllWim');
-		    var request = client.bigquery.jobs.query({
-		    	kind: "bigquery#queryRequest",
-		    	projectId: 'avail-wim',
-		    	timeoutMs: '30000'
-		    });
+	    var sql = 'SELECT state_fips,station_id,count(1) AS num_trucks '+
+				    'FROM [tmasWIM12.'+database+'] '+
+				    'WHERE state_fips IS NOT NULL '+
+				    'GROUP BY state_fips,station_id '+
+				    'ORDER BY state_fips,num_trucks DESC;';
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+	    function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
 
-		    var sql = 'SELECT state_fips,station_id,count(1) AS num_trucks '+
-					    'FROM [tmasWIM12.'+database+'] '+
-					    'WHERE state_fips IS NOT NULL '+
-					    'GROUP BY state_fips,station_id '+
-					    'ORDER BY state_fips,num_trucks DESC;';
-
-		    request.body = {};
-		    request.body.query = sql;
-		    request.body.projectId = 'avail-wim';
-		    //console.time('query-AllWim');
-	      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		//console.timeEnd('query-AllWim');
-	          		//console.time('send-AllWim');
-	          		res.json(response);
-	          		//console.timeEnd('send-AllWim');
-	          		console.timeEnd('total-AllWim');
-	        	});
-		});
+	    });
  	},
  	getAllClassStations: function(req,res){
  		var database = req.param('database')+'Class';
@@ -112,35 +101,25 @@ module.exports = {
  		console.time('total-AllClass');
 
  		//console.time('auth-AllClass');
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-	    	if (err) console.log(err);
-	    	//console.timeEnd('auth-AllClass')
-		    var request = client.bigquery.jobs.query({
-		    	kind: "bigquery#queryRequest",
-		    	projectId: 'avail-wim',
-		    	timeoutMs: '30000'
-		    });
-
-		    var sql = 'SELECT state_fips,station_id,sum(total_vol) AS num_trucks '+
+ 		var sql = 'SELECT state_fips,station_id,sum(total_vol) AS num_trucks '+
 					    'FROM [tmasWIM12.'+database+'] '+
 					    'WHERE state_fips IS NOT NULL '+
 					    'GROUP BY state_fips,station_id '+
 					    'ORDER BY state_fips,num_trucks DESC;';
 
-		    request.body = {};
-		    request.body.query = sql;
-		    request.body.projectId = 'avail-wim';
-	      	//console.time('query-AllClass')
-	      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		//console.timeEnd('query-AllClass');
-	          		///console.time('send-AllClass');
-	          		res.json(response);
-	          		//console.timeEnd('send-AllClass');
-	          		console.timeEnd('total-AllClass');
-	        	});
-		});
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},
 
  	getStateWimStations: function(req,res) {
@@ -153,17 +132,7 @@ module.exports = {
  			database = req.param('database');
 
  		//console.time('auth-wimState');
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-	    	if (err) console.log(err);
-			//console.timeEnd('auth-wimState');
- 		
-		    var request = client.bigquery.jobs.query({
-		    	kind: "bigquery#queryRequest",
-		    	projectId: 'avail-wim',
-		    	timeoutMs: '30000'
-		    });
-
-		    var sql = 'select station_id, year,count( distinct num_months) as numMon, '+
+ 		var sql = 'select station_id, year,count( distinct num_months) as numMon, '+
 		    		  'count(distinct num_days) as numDay, count(distinct num_hours)/8760 as percent, '+
 		    		  'sum(total)/count(distinct num_days) as AADT '+
 		    		  'from (select  station_id,year,concat(string(year),string(month)) as num_months, '+
@@ -176,21 +145,19 @@ module.exports = {
 		    				  'group by station_id,year,num_hours,num_months,num_days) '+
 		    			'group by station_id,year '+
 		    			'order by station_id,year';
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
 
-		    request.body = {};
-		    request.body.query = sql;
-		    request.body.projectId = 'avail-wim';
-		    //console.time('query-wimState');
-	      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		//console.timeEnd('query-wimState');
-	          		//console.time('send-wimState');
-	          		res.json(response);
-	          		//console.timeEnd('send-wimState');
-	          		console.timeEnd('total-wimState');
-	        	});
-		});
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},
  	getStateClassStations: function(req,res) {
  		if(typeof req.param('statefips') == 'undefined'){
@@ -202,36 +169,26 @@ module.exports = {
  			database = req.param('database')+'Class';
 
  		//console.time('auth-classState');
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-	    	if (err) console.log(err);
-		    //console.timeEnd('auth-classState');
-		    var request = client.bigquery.jobs.query({
-		    	kind: "bigquery#queryRequest",
-		    	projectId: 'avail-wim',
-		    	timeoutMs: '30000'
-		    });
-
-		    var sql = 'select station_id,year,avg(DT) as ADT ,avg(passenger) as APT,'+
+ 		var sql = 'select station_id,year,avg(DT) as ADT ,avg(passenger) as APT,'+
 		    'avg(SU) as ASU ,avg(TT) as ATT from (select station_id,year,month,day,sum(total_vol) as DT,'+
 		    ' sum(class1+class2+class3) as passenger, sum(class4+class5+class6+class7) as SU,'+
 		    ' sum(class8+class9+class10+class11+class12+class13) as TT from [tmasWIM12.'+database+'] where '+
 		    ' state_fips ="'+state_fips+'" group by state_fips,station_id,year,month,day order by station_id, '+
 		    'station_id,year,month,day) group by station_id,year'
 
-		    request.body = {};
-		    request.body.query = sql;
-		    request.body.projectId = 'avail-wim';
-		    //console.time('query-classState');
-	      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	        		if (err) console.log(err);
-	          		//console.timeEnd('query-classState');
-	          		//console.time('send-classState');
-	          		res.json(response);
-	          		//console.timeEnd('send-classState');
-	          		console.timeEnd('total-classState');
-	        	});
-		});
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},
  	getStationGeoForState: function(req, res) {
  		if(typeof req.param('statefips') == 'undefined'){
@@ -240,11 +197,6 @@ module.exports = {
  		}
  		var stateFIPS = +req.param('statefips');
 
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-	    	if (err) {
-	    		console.log(err);
-	    		return;
-	    	}
  		
 			var featureCollection = {
 				type: "FeatureCollection",
@@ -259,31 +211,24 @@ module.exports = {
 				"GROUP BY station_id,func_class_code,method_of_vehicle_class,"+
 				"method_of_truck_weighing,type_of_sensor,latitude,longitude;";
 
-		    var request = client.bigquery.jobs.query({
-		    	kind: "bigquery#queryRequest",
-		    	projectId: 'avail-wim',
-		    	timeoutMs: '30000'
-		    });
-		    request.body = {};
-		    request.body.query = sql;
-		    request.body.projectId = 'avail-wim';
-	      	request.withAuthClient(jwt)
-	        	.execute(function(err, BQobj) {
-			    	if (err) {
-			    		console.log(err);
-			    		return;
-			    	}
-			    	if (!('rows' in BQobj)) {
-			    		res.json(featureCollection);
-			    		return;
-			    	}
+		    var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      	
 
 			    	var schema = [];
-			    	BQobj.schema.fields.forEach(function(d) {
+			    	response.schema.fields.forEach(function(d) {
 			    		schema.push(d.name);
 			    	})
 
-			    	BQobj.rows.forEach(function(d) {
+			    	response.rows.forEach(function(d) {
 			    		var feature = {
 			    			type:'Feature',
 			    			geometry: {
@@ -314,7 +259,6 @@ module.exports = {
 
 	          		res.json(featureCollection);
 	        	});
-		});
  	},
  	getClassStationData: function(req, res) {
  		if(typeof req.param('id') == 'undefined'){
@@ -334,22 +278,19 @@ module.exports = {
 
  		var SQL = generateSQL();
 
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-	    	if (err) console.log(err);
-		    var request = client.bigquery.jobs.query({
-		    	kind: "bigquery#queryRequest",
-		    	projectId: 'avail-wim',
-		    	timeoutMs: '30000'
-		    });
-		    request.body = {};
-		    request.body.query = SQL;
-		    request.body.projectId = 'avail-wim';
-	      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		res.json(response);
-	        	});
-		});
+ 		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:SQL,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
 
 		function generateSQL() {
  			var sql	= "SELECT " + select[depth.length] + ", sum(total_vol) AS amount, "
@@ -396,30 +337,19 @@ module.exports = {
 
  		var SQL = generateSQL();
 
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-		    	if (err) {
-		    		console.log(err);
-		    		return;
-		    	}
+ 		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:SQL,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
 
-			    var request = client.bigquery.jobs.query({
-			    	kind: "bigquery#queryRequest",
-			    	projectId: 'avail-wim',
-			    	timeoutMs: '30000'
-			    });
-
-			    request.body = {};
-			    request.body.query = SQL;
-			    request.body.projectId = 'avail-wim';
-		      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) {
-	          			console.log(err);
-	          			return;
-	          		}
-	          		res.json(response);
-	        	});
-		});
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  		function generateSQL() {
  			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount "
  				+ "FROM [tmasWIM12."+database+"] "
@@ -442,11 +372,7 @@ module.exports = {
  		var station_id = req.param('id'),
  			database = req.param('database');
  		//console.time('auth');
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-		    //jwt.authorize(function(err, result) {
-		    	if (err) console.log(err);
-
-		    	var sql = 'SELECT num_days, count(num_days) AS numDay, '+
+ 		var sql = 'SELECT num_days, count(num_days) AS numDay, '+
 		    			   'month, day, class, year, '+
 		    			   'sum(total_weight) '+
 		    			   'FROM (SELECT station_id, class, '+
@@ -457,28 +383,19 @@ module.exports = {
 		    			   		 'AND station_id IS NOT null) '+
  						   'GROUP BY num_days, month, day, class, year';
 
-			    var request = client.bigquery.jobs.query({
-			    	kind: "bigquery#queryRequest",
-			    	projectId: 'avail-wim',
-			    	timeoutMs: '30000'
-			    });
-			    //console.timeEnd('auth');
-			    request.body = {};
-			    request.body.query = sql;
-			    request.body.projectId = 'avail-wim';
-			    //console.log(request.body.query);
-			    //console.time('query');
-		      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		//console.log(response);
-	          		//console.timeEnd('query');
-	          		//console.time('send');
-	          		res.json(response);
-	          		//console.timeEnd('send');
-	        	});
-		    //});
-		});
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},
  	getYearsActive:function(req,res){
  		var station_id = req.param('id'),
@@ -489,36 +406,25 @@ module.exports = {
  			return;
  		}
 
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-		    //jwt.authorize(function(err, result) {
-		    	if (err) console.log(err);
-		    	//console.log()
-			    var request = client.bigquery.jobs.query({
-			    	kind: "bigquery#queryRequest",
-			    	projectId: 'avail-wim',
-			    	timeoutMs: '30000'
-			    });
-			    request.body = {};
-			    request.body.query = 'SELECT min(year),max(year) FROM [tmasWIM12.'+database+'] WHERE station_id = "'+ station_id + '";';
-			    request.body.projectId = 'avail-wim';
-			    //console.log(request);
-		      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		//console.log(response);
-	          		res.json(response);
-	        	});
-		    //});
-		});
+ 		var sql = 'SELECT min(year),max(year) FROM [tmasWIM12.'+database+'] WHERE station_id = "'+ station_id + '";';
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},
  	getClassAmounts:function(req,res){
  		var database = req.param('database'),
  		station_id = req.param('stationId');
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-		    //jwt.authorize(function(err, result) {
-		    	if (err) console.log(err);
-
-		    	var sql = 'SELECT year, month, day, '+
+ 		var sql = 'SELECT year, month, day, '+
 		    			   'sum(class1), sum(class2), sum(class3), '+
 		    			   'sum(class4), sum(class5), sum(class6), '+
 		    			   'sum(class7), sum(class8), sum(class9), '+
@@ -528,35 +434,25 @@ module.exports = {
 		    			   'FROM [tmasWIM12.'+database+'Class] '+
 		    			   'WHERE station_id="'+station_id+'" '+
 		    			   'GROUP BY year, month, day';
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
 
-		    	//console.log()
-			    var request = client.bigquery.jobs.query({
-			    	kind: "bigquery#queryRequest",
-			    	projectId: 'avail-wim',
-			    	timeoutMs: '30000'
-			    });
-			    request.body = {};
-			    request.body.query = sql;
-			    request.body.projectId = 'avail-wim';
-			    //console.log(request);
-		      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		//console.log(response);
-	          		res.json(response);
-	        	});
-		    //});
-		});
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},
 	getStationInfo:function(req,res){
  		var database = req.param('database'),
  			station_id = req.param('id');
 
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-		    //jwt.authorize(function(err, result) {
-		    	if (err) console.log(err);
-
-		    	var sql = 'SELECT func_class_code, num_lanes_direc_indicated, '+
+ 		var sql = 'SELECT func_class_code, num_lanes_direc_indicated, '+
 			    			   'sample_type_for_traffic_vol, method_of_traffic_vol_counting, '+
 			    			   'alg_for_vehicle_class, class_sys_for_vehicle_class, '+
 			    			   'method_of_truck_weighing, calibration_of_weighing_sys, '+
@@ -569,24 +465,19 @@ module.exports = {
 		    			   'WHERE station_id="'+station_id+'" '+
 		    			   'LIMIT 1';
 
-		    	//console.log()
-			    var request = client.bigquery.jobs.query({
-			    	kind: "bigquery#queryRequest",
-			    	projectId: 'avail-wim',
-			    	timeoutMs: '30000'
-			    });
-			    request.body = {};
-			    request.body.query = sql;
-			    request.body.projectId = 'avail-wim';
-			    //console.log(request);
-		      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		//console.log(response);
-	          		res.json(response);
-	        	});
-		    //});
-		});
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},
  	getStationTimeLine: function(req,res) {
  		if(typeof req.param('statefips') == 'undefined'){
@@ -606,15 +497,7 @@ module.exports = {
  			year = req.param('year'),
  			database = req.param('database')+'Class';
 
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-	    	if (err) console.log(err);
-		    var request = client.bigquery.jobs.query({
-		    	kind: "bigquery#queryRequest",
-		    	projectId: 'avail-wim',
-		    	timeoutMs: '30000'
-		    });
-
-			if(time === 'hour'){
+ 		if(time === 'hour'){
 				if(year === 'All'){
 					var sql = 'select station_id,hour,avg(DT) as ADT, avg(passenger) as APT,avg(SU) as AST,avg(TT) as ATT,classCode '+
 		 			'from (select a.station_id,a.year,a.month,a.day,sum(a.total_vol) as DT,sum(a.class1+a.class2+a.class3) as passenger,'+
@@ -658,15 +541,19 @@ module.exports = {
 					'group by station_id,month,classCode'	
 				}
 			}
-			request.body = {};
-		    request.body.query = sql;
-		    request.body.projectId = 'avail-wim';
-	      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		res.json(response);
-	        	});
-		});
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},
  	getStateWeightStations: function(req,res) {
  		if(typeof req.param('stateFips') == 'undefined'){
@@ -676,28 +563,25 @@ module.exports = {
  		var state_fips = req.param('stateFips'),
  			database = req.param('database');
 
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-	    	if (err) console.log(err);
-		    var request = client.bigquery.jobs.query({
-		    	kind: "bigquery#queryRequest",
-		    	projectId: 'avail-wim',
-		    	timeoutMs: '30000'
-		    });
-		    var sql = 'select station_id,year,count(distinct num_hours) as hours,'+
+ 		var sql = 'select station_id,year,count(distinct num_hours) as hours,'+
 		    		  'sum(weight) as weight,class from (select station_id,year, month,day,'+
 		    		  'concat(string(year),string(month),string(day),string(hour)) as num_hours,'+
 		    		  'sum(total_weight) as weight,class FROM [tmasWIM12.'+database+'] where state_fips="'+state_fips+'"'+
 		    		  'group each by station_id,year,month,day,num_hours,class order by station_id,'+
 		    		  'year,month,day,num_hours,class) group by station_id,year,class'
- 			request.body = {};
-		    request.body.query = sql;
-		    request.body.projectId = 'avail-wim';
-	      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		res.json(response);
-	        	});
-		});
+ 		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},
  	getStateOverweightStations: function(req,res) {
  		if(typeof req.param('stateFips') == 'undefined'){
@@ -718,14 +602,7 @@ module.exports = {
  			threshold = req.param('threshold');
 
 
- 		googleapis.discover('bigquery', 'v2').execute(function(err, client) {
-	    	if (err) console.log(err);
-		    var request = client.bigquery.jobs.query({
-		    	kind: "bigquery#queryRequest",
-		    	projectId: 'avail-wim',
-		    	timeoutMs: '30000'
-		    });
-		    if(timeType === "on"){
+ 		if(timeType === "on"){
 		    	var sql = 'select a.station_id, SUM(CASE WHEN a.total_weight*220.462 >= '+threshold+' THEN 1 ELSE 0 END) as overTrucks,count(1) as total_trucks,a.month,b.func_class_code from [tmasWIM12.'+database+'] as a join (select station_id,func_class_code from [tmasWIM12.allStations] group by station_id, func_class_code) as b on a.station_id = b.station_id where a.state_fips="'+state_fips+'"'+
 		    	'and (a.class=8 or a.class=9 or a.class=10 or a.class=11 or a.class=12 or a.class=13) '+
 		    	'group by a.station_id,a.month,a.year,b.func_class_code order by a.station_id,a.month,a.year,b.func_class_code'
@@ -745,15 +622,19 @@ module.exports = {
 		    		  'and (class=8 or class=9 or class=10 or class=11 or class=12 or class=13) '+ 
 		    		  'group by station_id,year,month,day order by station_id,year,month,day'
 	   		}
-	   		request.body = {};
-		    request.body.query = sql;
-		    request.body.projectId = 'avail-wim';
-	      	request.withAuthClient(jwt)
-	        	.execute(function(err, response) {
-	          		if (err) console.log(err);
-	          		res.json(response);
-	        	});
-		});
+	   	var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},	
 
 
