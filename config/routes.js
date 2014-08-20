@@ -180,6 +180,15 @@ module.exports.routes = {
       headers: 'content-type,X-Requested-With'
     }
   },
+  '/stations/:stationID/byWeightTableInfo/':{
+    controller : 'StationsController',
+    action : 'getWeightTableInfo',
+    cors: {
+      origin: '*',
+      methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+      headers: 'content-type,X-Requested-With'
+    }
+  },
 
 
 

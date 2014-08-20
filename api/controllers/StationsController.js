@@ -196,7 +196,9 @@ module.exports = {
  			return;
  		}
  		var stateFIPS = +req.param('statefips');
-
+ 		if(parseInt(stateFIPS)<10){
+ 			stateFIPS = "0"+stateFIPS
+ 		}
  		
 			var featureCollection = {
 				type: "FeatureCollection",
@@ -211,7 +213,7 @@ module.exports = {
 				"GROUP BY station_id,func_class_code,method_of_vehicle_class,"+
 				"method_of_truck_weighing,type_of_sensor,latitude,longitude;";
 
-		    var request = bigQuery.jobs.query({
+		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
 	    	timeoutMs: '30000',
@@ -227,7 +229,6 @@ module.exports = {
 			    	response.schema.fields.forEach(function(d) {
 			    		schema.push(d.name);
 			    	})
-
 			    	response.rows.forEach(function(d) {
 			    		var feature = {
 			    			type:'Feature',
@@ -405,6 +406,9 @@ module.exports = {
  			res.send('Error, must specify database and station name', 500);
  			return;
  		}
+ 		if(req.param('isClass')==="class"){
+ 			database = database+"Class"
+ 		}
 
  		var sql = 'SELECT min(year),max(year) FROM [tmasWIM12.'+database+'] WHERE station_id = "'+ station_id + '";';
 		var request = bigQuery.jobs.query({
@@ -423,7 +427,7 @@ module.exports = {
  	},
  	getClassAmounts:function(req,res){
  		var database = req.param('database'),
- 		station_id = req.param('stationId');
+ 		station_id = req.param('id');
  		var sql = 'SELECT year, month, day, '+
 		    			   'sum(class1), sum(class2), sum(class3), '+
 		    			   'sum(class4), sum(class5), sum(class6), '+
@@ -443,7 +447,7 @@ module.exports = {
 	    },
 
 		function(err, response) {
-      		if (err) console.log('Error:',err);
+			if (err) console.log('Error:',err);
       		
       		res.json(response)
 	    });
@@ -569,6 +573,7 @@ module.exports = {
 		    		  'sum(total_weight) as weight,class FROM [tmasWIM12.'+database+'] where state_fips="'+state_fips+'"'+
 		    		  'group each by station_id,year,month,day,num_hours,class order by station_id,'+
 		    		  'year,month,day,num_hours,class) group by station_id,year,class'
+		
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -623,6 +628,31 @@ module.exports = {
 		    		  'group by station_id,year,month,day order by station_id,year,month,day'
 	   		}
 	   	var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
+ 	},
+ 	getWeightTableInfo: function(req,res) {
+ 		if(typeof req.param('stationID') == 'undefined'){
+ 			res.send('{status:"error",message:"state FIPS required"}',500);
+ 			return;
+ 		}
+ 		var stationId = req.param('stationID'),
+ 			database = req.param('database');
+
+ 		var sql = 'select DAYOFWEEK(TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day)))) '+
+		    'as week,hour,count(1),dir from [tmasWIM12.'+database+'] where station_id = "'+stationId+'" group by '+
+		    'week,year,month,day,hour,dir order by week,year,month,day,hour,dir;'
+		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
 	    	timeoutMs: '30000',
