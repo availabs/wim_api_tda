@@ -665,6 +665,99 @@ module.exports = {
       		
       		res.json(response)
 	    });
+ 	},
+ 	getTonageInfo: function(req,res) {
+ 		if(typeof req.param('stationID') == 'undefined'){
+ 			res.send('{status:"error",message:"state FIPS required"}',500);
+ 			return;
+ 		}
+ 		var stationId = req.param('stationID'),
+ 			database = req.param('database');
+ 		var empty_truck_tonage = 43558,
+ 			truck_class = 9
+ 		// var sql = 'SELECT SUM(case when ((total_weight*220.462)-'+empty_truck_tonage+') >= 0 and '+
+ 		// 	'((total_weight*220.462)-'+empty_truck_tonage+') < 10000 then total_weight else 0 end) as zero_tenVIUS,'+
+ 		// 	' SUM(case when ((total_weight*220.462)-'+empty_truck_tonage+') >= 10000 and ((total_weight*220.462)-'+empty_truck_tonage+')'+
+ 		// 	' < 20000 then total_weight else 0 end) as ten_twenVIUS, SUM(case when ((total_weight*220.462)-'+empty_truck_tonage+')'+
+ 		// 	' >= 20000 and ((total_weight*220.462)-'+empty_truck_tonage+') < 30000 then total_weight else 0 end) as twen_thirVIUS,'+
+ 		// 	' SUM(case when ((total_weight*220.462)-'+empty_truck_tonage+') >= 30000 and ((total_weight*220.462)-'+empty_truck_tonage+') < 40000 then'+
+ 		// 	' total_weight else 0 end) as thir_fortVIUS, SUM(case when ((total_weight*220.462)-'+empty_truck_tonage+') >= 40000 and'+
+ 		// 	' ((total_weight*220.462)-'+empty_truck_tonage+') < 50000 then total_weight else 0 end) as fort_fiftVIUS, SUM(case when'+
+ 		// 	' ((total_weight*220.462)-'+empty_truck_tonage+') >= 50000 then total_weight else 0 end) as great_fiftyVIUS,'+
+ 		// 	' SUM(case when total_weight*220.462 <= '+empty_truck_tonage+' then total_weight else 0 end) as empty_vius,'+
+ 		// 	' TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day))) as date,'+
+ 		// 	'DAYOFWEEK(TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day)))) as day_,'+
+ 		// 	' count(1) FROM [tmasWIM12.'+database+'] where class = '+truck_class+' and station_id = "'+stationId+'"" group by year,month,day,date,day_'
+ 		var sql = 'SELECT SUM(case when ((total_weight*220.462)-12209) >= 0 and class = 1 then total_weight else 0 end) ,'+
+ 			//' SUM(case when total_weight*220.462 <= '+empty_truck_tonage+' then total_weight else 0 end) as empty_vius,'+
+ 			' year,month,day, '+
+ 			'SUM(case when ((total_weight*220.462)-25189) >= 0 and class = 2 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-34303) >= 0 and class = 3 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-19539) >= 0 and class = 4 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-31464) >= 0 and class = 5 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-39739) >= 0 and class = 6 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-37000) >= 0 and class = 7 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 8 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-51935) >= 0 and class = 9 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-31000) >= 0 and class = 10 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class > 10 then total_weight else 0 end) ,'+
+ 			//'DAYOFWEEK(TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day)))) as day_, class = '+truck_class+'
+ 			/*' count(1)*/' FROM [tmasWIM12.'+database+'] where class = 9 and station_id = "'+stationId+'" group by year,month,day'
+ 			
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
+ 	},
+ 	getTonageStations: function(req,res) {
+ 		if(typeof req.param('stateFips') == 'undefined'){
+ 			res.send('{status:"error",message:"state FIPS required"}',500);
+ 			return;
+ 		}
+ 		var state_fips = req.param('stateFips'),
+ 			database = req.param('database');
+ 		var empty_truck_tonage = 43558,
+ 			truck_class = 9
+ 		/*In the future, may need to edit total weight formula*/
+ 		var sql = 'SELECT SUM(case when ((total_weight*220.462)-12209) >= 0 and class = 1 then total_weight else 0 end) ,'+
+ 			//' SUM(case when total_weight*220.462 <= '+empty_truck_tonage+' then total_weight else 0 end) as empty_vius,'+
+ 			'SUM(case when ((total_weight*220.462)-25189) >= 0 and class = 2 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-34303) >= 0 and class = 3 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-19539) >= 0 and class = 4 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-31464) >= 0 and class = 5 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-39739) >= 0 and class = 6 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-37000) >= 0 and class = 7 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 8 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-51935) >= 0 and class = 9 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-31000) >= 0 and class = 10 then total_weight else 0 end) ,'+
+ 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class > 10 then total_weight else 0 end) ,'+
+ 			'station_id'+
+ 			' year,month,day, '+
+ 			//'DAYOFWEEK(TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day)))) as day_, class = '+truck_class+'
+ 			/*' count(1)*/' FROM [tmasWIM12.'+database+'] where class = 9 and state_fips = "'+state_fips+'" group by station_id,year,month,day'
+ 			//console.log(sql)
+		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '30000',
+	    	resource: {query:sql,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
+
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		
+      		res.json(response)
+	    });
  	},	
 
 

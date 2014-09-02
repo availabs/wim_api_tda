@@ -189,6 +189,24 @@ module.exports.routes = {
       headers: 'content-type,X-Requested-With'
     }
   },
+  '/station/:stationID/byTonageInfo/':{
+    controller : 'StationsController',
+    action : 'getTonageInfo',
+    cors: {
+      origin: '*',
+      methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+      headers: 'content-type,X-Requested-With'
+    }
+  },
+  '/station/:stateFips/byTonageStations/':{
+    controller : 'StationsController',
+    action : 'getTonageStations',
+    cors: {
+      origin: '*',
+      methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+      headers: 'content-type,X-Requested-With'
+    }
+  },
 
 
 
