@@ -321,6 +321,7 @@ module.exports = {
  		}
  	},
  	getWimStationData:function(req,res){
+ 		console.log('getWimStationData');
  		if(typeof req.param('id') == 'undefined'){
  			res.send('{status:"error",message:"station_id required"}',500);
  			return;
