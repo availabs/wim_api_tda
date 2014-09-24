@@ -337,7 +337,7 @@ module.exports = {
  		};
 
  		var SQL = generateSQL();
-
+ 		console.time('getWimStationDataQuery')
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -348,8 +348,10 @@ module.exports = {
 
 		function(err, response) {
       		if (err) console.log('Error:',err);
-      		
+      		console.timeEnd('getWimStationDataQuery')
+      		console.time('getWimStationDataSend')
       		res.json(response)
+      		console.timeEnd('getWimStationDataSend')
 	    });
  		function generateSQL() {
  			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount "
