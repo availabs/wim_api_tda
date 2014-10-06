@@ -410,7 +410,6 @@ module.exports = {
 	    });
  	},
  	getYearsActive:function(req,res){
- 		console.log('getYearsActiveInfoQuery')
  		var station_id = req.param('id'),
  			database = req.param('database');
 
@@ -423,8 +422,7 @@ module.exports = {
  		}
 
  		var sql = 'SELECT min(year),max(year) FROM [tmasWIM12.'+database+'] WHERE station_id = "'+ station_id + '";';
- 		console.time('getYearsActiveInfoQuery')
-		var request = bigQuery.jobs.query({
+ 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
 	    	timeoutMs: '30000',
@@ -434,7 +432,6 @@ module.exports = {
 
 		function(err, response) {
       		if (err) console.log('Error:',err);
-      		console.timeEnd('getYearsActiveInfoQuery')
       		res.json(response)
 	    });
  	},
