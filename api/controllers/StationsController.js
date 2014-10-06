@@ -280,6 +280,7 @@ module.exports = {
  		var SQL = generateSQL();
 
  		console.time('getClassStationData Query');
+ 		console.log("getclassstationData ",SQL)
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -342,6 +343,7 @@ module.exports = {
 
  		var SQL = generateSQL();
  		console.time('getWimStationDataQuery')
+ 		console.log("wimstation ",SQL)
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -391,7 +393,7 @@ module.exports = {
 		    			   		 'AND station_id IS NOT null) '+
  						   'GROUP BY num_days, month, day, class, year';
  		console.time('getDailyWeightInfoQuery')
- 		console.log(sql)
+ 		console.log("getDailyWeights ",sql)
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -450,7 +452,7 @@ module.exports = {
 		    			   'WHERE station_id="'+station_id+'" '+
 		    			   'GROUP BY year, month, day';
 		console.time('getClassAmountsInfoQuery')
-		console.log(sql)
+		console.log("getClassAmounts ",sql)
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -668,7 +670,7 @@ module.exports = {
 		    'as week,hour,count(1),dir from [tmasWIM12.'+database+'] where station_id = "'+stationId+'" group by '+
 		    'week,year,month,day,hour,dir order by week,year,month,day,hour,dir;'
 		console.time('getWeightTableInfoQuery')
-		console.log(sql)
+		console.log("gettableweight ",sql)
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -723,6 +725,7 @@ module.exports = {
  			//'DAYOFWEEK(TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day)))) as day_, class = '+truck_class+'
  			/*' count(1)*/' FROM [tmasWIM12.'+database+'] where class = 9 and station_id = "'+stationId+'" group by year,month,day'
  		console.time('getTonageInfoQuery')
+ 		console.log("gettonnageinfo ",sql)
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
