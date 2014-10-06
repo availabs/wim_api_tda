@@ -738,7 +738,6 @@ module.exports = {
 	    });
  	},
  	getTonageStations: function(req,res) {
- 		console.log('getTonageStationsQuery')
  		if(typeof req.param('stateFips') == 'undefined'){
  			res.send('{status:"error",message:"state FIPS required"}',500);
  			return;
@@ -765,9 +764,7 @@ module.exports = {
  			//'DAYOFWEEK(TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day)))) as day_, class = '+truck_class+'
  			/*' count(1)*/' FROM [tmasWIM12.'+database+'] where class = 9 and state_fips = "'+state_fips+'" group by station_id,year,month,day'
  			//console.log(sql)
- 			console.time('getTonageStationsQuery')
- 			console.log(sql)
-		var request = bigQuery.jobs.query({
+ 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
 	    	timeoutMs: '30000',
@@ -776,10 +773,8 @@ module.exports = {
 	    },
 
 		function(err, response) {
-			console.log("getTonage error: ",err)
-      		if (err) console.log('Error:',err);
- 			console.timeEnd('getTonageStationsQuery')
-      		res.json(response)
+			if (err) console.log('Error:',err);
+ 			res.json(response)
 	    });
  	},
  	
