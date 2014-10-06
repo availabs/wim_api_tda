@@ -403,10 +403,9 @@ module.exports = {
 	    },
 
 		function(err, response) {
-			console.log(err)
+			console.log("dailyweight ",err)
 
       		if (err) console.log('Error:',err);
-      		console.log("Not running?")
       		console.timeEnd('getDailyWeightInfoQuery')
       		res.json(response)
 	    });
