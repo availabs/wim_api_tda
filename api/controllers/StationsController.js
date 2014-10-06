@@ -450,6 +450,7 @@ module.exports = {
 		    			   'WHERE station_id="'+station_id+'" '+
 		    			   'GROUP BY year, month, day';
 		console.time('getClassAmountsInfoQuery')
+		console.log(sql)
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -459,6 +460,7 @@ module.exports = {
 	    },
 
 		function(err, response) {
+			console.log("classamount error: ",err)
 			if (err) console.log('Error:',err);
       		console.timeEnd('getClassAmountsInfoQuery')
       		res.json(response)
@@ -666,6 +668,7 @@ module.exports = {
 		    'as week,hour,count(1),dir from [tmasWIM12.'+database+'] where station_id = "'+stationId+'" group by '+
 		    'week,year,month,day,hour,dir order by week,year,month,day,hour,dir;'
 		console.time('getWeightTableInfoQuery')
+		console.log(sql)
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -675,6 +678,7 @@ module.exports = {
 	    },
 
 		function(err, response) {
+			console.log("weight table error: ",err)
       		if (err) console.log('Error:',err);
       		console.timeEnd('getWeightTableInfoQuery')
       		res.json(response)
@@ -762,6 +766,7 @@ module.exports = {
  			/*' count(1)*/' FROM [tmasWIM12.'+database+'] where class = 9 and state_fips = "'+state_fips+'" group by station_id,year,month,day'
  			//console.log(sql)
  			console.time('getTonageStationsQuery')
+ 			console.log(sql)
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -771,8 +776,9 @@ module.exports = {
 	    },
 
 		function(err, response) {
+			console.log("getTonage error: ",err)
       		if (err) console.log('Error:',err);
-      		console.timeEnd('getTonageStationsQuery')
+ 			console.timeEnd('getTonageStationsQuery')
       		res.json(response)
 	    });
  	},
