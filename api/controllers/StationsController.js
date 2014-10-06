@@ -391,6 +391,7 @@ module.exports = {
 		    			   		 'AND station_id IS NOT null) '+
  						   'GROUP BY num_days, month, day, class, year';
  		console.time('getDailyWeightInfoQuery')
+ 		console.log(sql)
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -400,7 +401,10 @@ module.exports = {
 	    },
 
 		function(err, response) {
+			console.log(err)
+
       		if (err) console.log('Error:',err);
+      		console.log("Not running?")
       		console.timeEnd('getDailyWeightInfoQuery')
       		res.json(response)
 	    });
