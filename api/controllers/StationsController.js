@@ -321,6 +321,7 @@ module.exports = {
  		}
  	},
  	getWimStationData:function(req,res){
+ 		console.log('getWimStationData');
  		if(typeof req.param('id') == 'undefined'){
  			res.send('{status:"error",message:"station_id required"}',500);
  			return;
@@ -337,7 +338,7 @@ module.exports = {
  		};
 
  		var SQL = generateSQL();
-
+ 		console.time('getWimStationDataQuery')
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
@@ -348,8 +349,10 @@ module.exports = {
 
 		function(err, response) {
       		if (err) console.log('Error:',err);
-      		
+      		console.timeEnd('getWimStationDataQuery')
+      		console.time('getWimStationDataSend')
       		res.json(response)
+      		console.timeEnd('getWimStationDataSend')
 	    });
  		function generateSQL() {
  			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount "
