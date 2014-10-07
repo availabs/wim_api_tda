@@ -84,7 +84,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -110,7 +110,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -148,7 +148,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -179,7 +179,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -216,7 +216,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -284,7 +284,7 @@ module.exports = {
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:SQL,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -347,7 +347,7 @@ module.exports = {
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:SQL,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -397,7 +397,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -426,7 +426,7 @@ module.exports = {
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -455,7 +455,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -487,7 +487,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -563,7 +563,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -592,7 +592,7 @@ module.exports = {
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -645,7 +645,7 @@ module.exports = {
 	   	var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -673,7 +673,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -728,7 +728,7 @@ module.exports = {
 		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -769,7 +769,7 @@ module.exports = {
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '40000',
+	    	timeoutMs: '120000',
 	    	resource: {query:sql,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
