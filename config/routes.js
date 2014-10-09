@@ -90,7 +90,7 @@ module.exports.routes = {
     }
   },
   '/station/:id/graphwimData':{
-    controller : 'TestController',
+    controller : 'StationsController',
     action : 'getWimStationData',
     cors: {
       origin: '*',
