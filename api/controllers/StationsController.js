@@ -348,7 +348,7 @@ module.exports = {
  		var request = bigQuery.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
-	    	timeoutMs: '1000',
+	    	timeoutMs: '100000',
 	    	resource: {query:SQL,projectId:'avail-wim'},
 	    	auth: jwt
 	    },
@@ -358,7 +358,6 @@ module.exports = {
       		console.timeEnd('getWimStationDataQuery')
       		console.time('getWimStationDataSend')
       		console.log(response)
-      		console.log(response.jobcomplete)
       		res.json(response)
       		console.timeEnd('getWimStationDataSend')
 	    });
