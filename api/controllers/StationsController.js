@@ -345,24 +345,21 @@ module.exports = {
  		var SQL = generateSQL();
  		console.time('getWimStationDataQuery')
  		console.log("wimstation ",SQL)
- 	// 	var request = bigQuery.jobs.query({
-	 //    	kind: "bigquery#queryRequest",
-	 //    	projectId: 'avail-wim',
-	 //    	timeoutMs: '10000',
-	 //    	resource: {query:SQL,projectId:'avail-wim'},
-	 //    	auth: jwt
-	 //    },
+ 		var request = bigQuery.jobs.query({
+	    	kind: "bigquery#queryRequest",
+	    	projectId: 'avail-wim',
+	    	timeoutMs: '1',
+	    	resource: {query:SQL,projectId:'avail-wim'},
+	    	auth: jwt
+	    },
 
-		// function(err, response) {
-  //     		if (err) console.log('Error:',err);
-  //     		console.timeEnd('getWimStationDataQuery')
-  //     		console.time('getWimStationDataSend')
-  //     		res.json(response)
-  //     		console.timeEnd('getWimStationDataSend')
-	 //    });
-		console.log("end")
-		console.timeEnd('getWimStationDataQuery')
-		res.json({x:"X"})
+		function(err, response) {
+      		if (err) console.log('Error:',err);
+      		console.timeEnd('getWimStationDataQuery')
+      		console.time('getWimStationDataSend')
+      		res.json(response)
+      		console.timeEnd('getWimStationDataSend')
+	    });
  		function generateSQL() {
  			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount "
  				+ "FROM [tmasWIM12."+database+"] "
