@@ -49,4 +49,5 @@ config/local.js
 #######################
 *.pem
 *.p12
+availwim.json
 
