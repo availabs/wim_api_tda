@@ -361,6 +361,8 @@ module.exports = {
   //     		console.timeEnd('getWimStationDataSend')
 	 //    });
 		console.log("end")
+		console.timeEnd('getWimStationDataQuery')
+		res.json({x:"X"})
  		function generateSQL() {
  			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount "
  				+ "FROM [tmasWIM12."+database+"] "
