@@ -325,7 +325,7 @@ module.exports = {
  		}
  	},
  	getWimStationData:function(req,res){
- 		var bigQuery2 = googleapis.bigquery('v2');
+
  		console.log('getWimStationData');
  		if(typeof req.param('id') == 'undefined'){
  			res.send('{status:"error",message:"station_id required"}',500);
@@ -345,21 +345,22 @@ module.exports = {
  		var SQL = generateSQL();
  		console.time('getWimStationDataQuery')
  		console.log("wimstation ",SQL)
- 		var request = bigQuery2.jobs.query({
-	    	kind: "bigquery#queryRequest",
-	    	projectId: 'avail-wim',
-	    	timeoutMs: '10000',
-	    	resource: {query:SQL,projectId:'avail-wim'},
-	    	auth: jwt
-	    },
+ 	// 	var request = bigQuery.jobs.query({
+	 //    	kind: "bigquery#queryRequest",
+	 //    	projectId: 'avail-wim',
+	 //    	timeoutMs: '10000',
+	 //    	resource: {query:SQL,projectId:'avail-wim'},
+	 //    	auth: jwt
+	 //    },
 
-		function(err, response) {
-      		if (err) console.log('Error:',err);
-      		console.timeEnd('getWimStationDataQuery')
-      		console.time('getWimStationDataSend')
-      		res.json(response)
-      		console.timeEnd('getWimStationDataSend')
-	    });
+		// function(err, response) {
+  //     		if (err) console.log('Error:',err);
+  //     		console.timeEnd('getWimStationDataQuery')
+  //     		console.time('getWimStationDataSend')
+  //     		res.json(response)
+  //     		console.timeEnd('getWimStationDataSend')
+	 //    });
+		console.log(end)
  		function generateSQL() {
  			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount "
  				+ "FROM [tmasWIM12."+database+"] "
