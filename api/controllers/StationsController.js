@@ -325,6 +325,7 @@ module.exports = {
  		}
  	},
  	getWimStationData:function(req,res){
+ 		var bigQuery2 = googleapis.bigquery('v2');
  		console.log('getWimStationData');
  		if(typeof req.param('id') == 'undefined'){
  			res.send('{status:"error",message:"station_id required"}',500);
@@ -344,7 +345,7 @@ module.exports = {
  		var SQL = generateSQL();
  		console.time('getWimStationDataQuery')
  		console.log("wimstation ",SQL)
- 		var request = bigQuery.jobs.query({
+ 		var request = bigQuery2.jobs.query({
 	    	kind: "bigquery#queryRequest",
 	    	projectId: 'avail-wim',
 	    	timeoutMs: '10000',
